@@ -33,8 +33,18 @@ const ListaAprendices = () => {
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ nombre: "", apellido: "", email: "", telefono: "", direccion: "" });
-  const [idFiltro, setIdFiltro] = useState("");
+const [form, setForm] = useState({
+  nombre: "",
+  apellido: "",
+  email: "",
+  telefono: "",
+  direccion: "",
+  ficha: "",
+  estado: "",
+  RH: "",
+  regional: "",
+  programa: ""
+});  const [idFiltro, setIdFiltro] = useState("");
 
   const fetchTodos = async () => {
     try {
@@ -60,8 +70,18 @@ const ListaAprendices = () => {
     try {
       setLoading(true);
       await axios.post(API_BASE, form, { headers: { "Content-Type": "application/json" } });
-      setForm({ nombre: "", apellido: "", email: "", telefono: "", direccion: "" });
-      await fetchTodos();
+setForm({
+  nombre: "",
+  apellido: "",
+  email: "",
+  telefono: "",
+  direccion: "",
+  ficha: "",
+  estado: "",
+  RH: "",
+  regional: "",
+  programa: ""
+});      await fetchTodos();
     } catch (e) { console.error("Error creando aprendiz:", e); }
     finally { setLoading(false); }
   };
@@ -95,26 +115,97 @@ const ListaAprendices = () => {
           <Button variant="contained" color="error" onClick={eliminarPorId} disabled={loading || !idFiltro}>
             ELIMINAR POR ID
           </Button>
+          <button onClick={() => setIdFiltro("")} disabled={loading || !idFiltro} style={{ backgroundColor: "#6b7280", color: "#fff", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>
+            Actualizar ID
+          </button>
         </Stack>
 
         {/* Formulario creación */}
         <Paper elevation={4} sx={{ p: 2, mb: 3, border: "1px solid #334155", bgcolor: "background.paper" }}>
           <Typography sx={{ mb: 2, fontWeight: 600, color: "text.primary" }}>Crear aprendiz</Typography>
-          <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-            <TextField label="Nombre" value={form.nombre}
-              onChange={(e) => setForm({ ...form, nombre: e.target.value })} sx={{ ...inputSX, flex: 1 }} />
-            <TextField label="Apellido" value={form.apellido}
-              onChange={(e) => setForm({ ...form, apellido: e.target.value })} sx={{ ...inputSX, flex: 1 }} />
-            <TextField label="Email" value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })} sx={{ ...inputSX, flex: 1.2 }} />
-            <TextField label="Teléfono" value={form.telefono}
-              onChange={(e) => setForm({ ...form, telefono: e.target.value })} sx={{ ...inputSX, flex: 1 }} />
-            <TextField label="Dirección" value={form.direccion}
-              onChange={(e) => setForm({ ...form, direccion: e.target.value })} sx={{ ...inputSX, flex: 1.6 }} />
-            <Button variant="contained" color="primary" onClick={crearAprendiz} disabled={loading}>
-              CREAR
-            </Button>
-          </Stack>
+          <Stack direction="column" spacing={2}>
+
+<TextField 
+ label="Nombre" 
+ value={form.nombre}
+ onChange={(e)=>setForm({...form,nombre:e.target.value})}
+ sx={inputSX}
+/>
+
+<TextField 
+ label="Apellido" 
+ value={form.apellido}
+ onChange={(e)=>setForm({...form,apellido:e.target.value})}
+ sx={inputSX}
+/>
+
+<TextField 
+ label="Email" 
+ value={form.email}
+ onChange={(e)=>setForm({...form,email:e.target.value})}
+ sx={inputSX}
+/>
+
+<TextField 
+ label="Teléfono" 
+ value={form.telefono}
+ onChange={(e)=>setForm({...form,telefono:e.target.value})}
+ sx={inputSX}
+/>
+
+<TextField 
+ label="Dirección" 
+ value={form.direccion}
+ onChange={(e)=>setForm({...form,direccion:e.target.value})}
+ sx={inputSX}
+/>
+
+<TextField 
+ label="Ficha" 
+ value={form.ficha}
+ onChange={(e)=>setForm({...form,ficha:e.target.value})}
+ sx={inputSX}
+/>
+
+<TextField 
+ label="Estado" 
+ value={form.estado}
+ onChange={(e)=>setForm({...form,estado:e.target.value})}
+ sx={inputSX}
+/>
+
+<TextField 
+ label="RH" 
+ value={form.RH}
+ onChange={(e)=>setForm({...form,RH:e.target.value})}
+ sx={inputSX}
+/>
+
+<TextField 
+ label="Regional"
+ value={form.regional}
+ onChange={(e)=>setForm({...form,regional:e.target.value})}
+ sx={inputSX}
+/>
+
+<TextField 
+ label="Programa"
+ value={form.programa}
+ onChange={(e)=>setForm({...form,programa:e.target.value})}
+ sx={inputSX}
+/>
+
+
+<Button 
+ variant="contained" 
+ color="primary" 
+ onClick={crearAprendiz}
+ disabled={loading}
+>
+ CREAR
+</Button>
+
+</Stack>
         </Paper>
 
         {/* Tabla */}
@@ -122,7 +213,19 @@ const ListaAprendices = () => {
           <Table>
             <TableHead>
               <TableRow sx={{ background: "#22d3ee" }}>
-                {["ID","Nombre","Apellido","Email","Teléfono","Dirección"].map((h) => (
+                {[
+ "ID",
+ "Nombre",
+ "Apellido",
+ "Email",
+ "Teléfono",
+ "Dirección",
+ "Ficha",
+ "Estado",
+ "RH",
+ "Regional",
+ "Programa"
+].map((h) => (
                   <TableCell key={h} sx={{ color: "#0b1220", fontWeight: 700 }}>{h}</TableCell>
                 ))}
               </TableRow>
