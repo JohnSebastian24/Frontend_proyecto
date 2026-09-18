@@ -18,7 +18,10 @@ export const obtenerAprendizPorId = (id) => {
 
 // Crear
 export const crearAprendiz = (data) => {
-    return axios.post(API_BASE, data);
+    return axios.post(
+        "http://localhost:8081/api/v1/aprendiz",
+        data
+    );
 };
 
 

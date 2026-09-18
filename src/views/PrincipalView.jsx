@@ -165,6 +165,8 @@ console.log(error);
 
 const crearAprendiz=async()=>{
 
+  console.log(form);
+
 try{
 
 setLoading(true);
@@ -176,6 +178,16 @@ limpiarFormulario();
 await fetchTodos();
 
 }catch(error){
+
+if(error.response?.status === 500){
+
+alert("No se pudo crear el aprendiz. Verifique que el correo no esté registrado.");
+
+}else{
+
+alert("Ocurrió un error al crear el aprendiz.");
+
+}
 
 console.log(error);
 
@@ -282,7 +294,7 @@ color="primary"
 onClick={()=>buscarParaActualizar(idFiltro)}
 disabled={!idFiltro}
 >
-CARGAR PARA EDITAR
+Actualizar por ID
 </Button>
 
 
