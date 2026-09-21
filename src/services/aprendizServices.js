@@ -1,8 +1,9 @@
 import axios from "axios";
 
 
-const API_BASE = "http://localhost:8081/api/v1/aprendiz";
-
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:8081/api/v1/aprendiz";
 
 // Obtener todos
 export const obtenerAprendices = () => {
