@@ -3,7 +3,7 @@ import axios from "axios";
 
 const API_BASE =
   import.meta.env.VITE_API_URL ||
-  "http://localhost:8081/api/v1/aprendiz";
+  "http://127.0.0.1:8000/api/v1/aprendiz";
 
 // Obtener todos
 export const obtenerAprendices = () => {
@@ -20,7 +20,7 @@ export const obtenerAprendizPorId = (id) => {
 // Crear
 export const crearAprendiz = (data) => {
     return axios.post(
-        "http://localhost:8081/api/v1/aprendiz",
+        API_BASE,
         data
     );
 };

@@ -1,3 +1,5 @@
+//Query para obtener todos los aprendices
+
 import React, { useState } from "react";
 import { Box, Typography, Button, TextField, Stack, CssBaseline } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -13,7 +15,7 @@ import {
   eliminarAprendiz as eliminarServicio
 } from "../services/aprendizServices";
 
-
+// Crear un tema personalizado para MUI
 const theme = createTheme({
   palette:{
     mode:"dark",
@@ -25,7 +27,7 @@ const theme = createTheme({
   }
 });
 
-
+// Estilos para los campos de entrada
 const inputSX = {
   bgcolor:"#f3f4f6",
   borderRadius:1,
@@ -44,7 +46,7 @@ const inputSX = {
   }
 };
 
-
+// Componente principal que maneja la lista de aprendices
 const ListaAprendices =()=>{
 
 const [data,setData]=useState([]);
@@ -68,7 +70,7 @@ const [editando,setEditando]=useState(false);
 const [idActualizar,setIdActualizar]=useState(null);
 
 
-
+// Función para limpiar el formulario
 const limpiarFormulario=()=>{
  setForm({
   nombre:"",
@@ -85,7 +87,7 @@ const limpiarFormulario=()=>{
 };
 
 
-
+// Función para obtener todos los aprendices
 const fetchTodos=async()=>{
  try{
   setLoading(true);
@@ -100,7 +102,7 @@ const fetchTodos=async()=>{
 };
 
 
-
+// Función para obtener un aprendiz por ID
 const fetchPorId=async()=>{
 
 if(!idFiltro)return;
@@ -121,7 +123,7 @@ try{
 };
 
 
-
+// Función para buscar un aprendiz por ID y llenar el formulario para actualizar
 const buscarParaActualizar=async(id)=>{
 
 if(!id)return;
@@ -162,7 +164,7 @@ console.log(error);
 };
 
 
-
+// Función para crear un nuevo aprendiz
 const crearAprendiz=async()=>{
 
   console.log(form);
@@ -199,7 +201,7 @@ setLoading(false);
 
 };
 
-
+// Función para actualizar un aprendiz existente
 
 const actualizarAprendiz=async()=>{
 
@@ -223,6 +225,7 @@ console.log(error);
 
 };
 
+// Función para eliminar un aprendiz por ID
 const eliminarPorId=async()=>{if(!idFiltro)return;
 
 try{
@@ -247,6 +250,7 @@ setLoading(false);
 
 return(
 
+// Renderizado del componente con tema personalizado y formulario de aprendices
 <ThemeProvider theme={theme}>
 
 <CssBaseline/>
