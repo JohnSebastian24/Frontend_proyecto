@@ -83,8 +83,8 @@ const AprendizForm = ({
             <TextField
               variant="outlined"
               label="RH"
-              value={form.RH ?? ""}
-              onChange={(e) => setForm({ ...form, RH: e.target.value })}
+              value={form.rh ?? ""}
+onChange={(e) => setForm({ ...form, rh: e.target.value })}
               sx={inputSX}
             />
 

@@ -153,7 +153,7 @@ const AprendizTable = ({
 
 
                   <TableCell>
-                    {row.RH}
+                    {row.rh}
                   </TableCell>
 
 

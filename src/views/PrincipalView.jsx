@@ -80,7 +80,7 @@ const limpiarFormulario=()=>{
   direccion:"",
   ficha:"",
   estado:"",
-  RH:"",
+  rh:"",
   regional:"",
   programa:""
  });
@@ -145,7 +145,7 @@ try{
   direccion:aprendiz.direccion || "",
   ficha:aprendiz.ficha || "",
   estado:aprendiz.estado || "",
-  RH:aprendiz.RH || "",
+  rh:aprendiz.rh || "",
   regional:aprendiz.regional || "",
   programa:aprendiz.programa || ""
  });
