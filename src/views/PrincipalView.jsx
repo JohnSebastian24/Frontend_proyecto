@@ -1,162 +1,358 @@
-import React, { useState } from "react";
-import {
-  Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Typography, Button, TextField, Stack, CssBaseline
-} from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import axios from "axios";
+//Query para obtener todos los aprendices
 
+import React, { useState } from "react";
+import { Box, Typography, Button, TextField, Stack, CssBaseline } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+
+import AprendizForm from "../components/AprendizForm";
+import AprendizTable from "../components/AprendizTable";
+
+import {
+  obtenerAprendices,
+  obtenerAprendizPorId,
+  crearAprendiz as crearServicio,
+  actualizarAprendiz as actualizarServicio,
+  eliminarAprendiz as eliminarServicio
+} from "../services/aprendizServices";
+
+// Crear un tema personalizado para MUI
 const theme = createTheme({
-  palette: {
-    mode: "dark",
-    primary: { main: "#22d3ee" },       // cian
-    secondary: { main: "#a78bfa" },     // violeta
-    error: { main: "#ef4444" },
-    background: { default: "#0b1220", paper: "#111827" }, // dark limpio
-    text: { primary: "#e5e7eb", secondary: "#94a3b8" }
+  palette:{
+    mode:"dark",
+    primary:{main:"#22d3ee"},
+    secondary:{main:"#a78bfa"},
+    error:{main:"#ef4444"},
+    background:{default:"#0b1220",paper:"#111827"},
+    text:{primary:"#e5e7eb",secondary:"#94a3b8"}
   }
 });
 
+// Estilos para los campos de entrada
 const inputSX = {
-  bgcolor: "#f3f4f6",       // fondo claro para inputs
-  borderRadius: 1,
-  input: { color: "#111827" },
-  "& .MuiInputLabel-root": { color: "#374151" },
-  "& .MuiOutlinedInput-notchedOutline": { borderColor: "#cbd5e1" },
-  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#94a3b8" },
-  "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#22d3ee" }
+  bgcolor:"#f3f4f6",
+  borderRadius:1,
+  "& .MuiInputBase-input":{
+    color:"#111827",
+    padding:"14px"
+  },
+  "& .MuiInputLabel-root":{
+    color:"#374151"
+  },
+  "& .MuiInputLabel-root.Mui-focused":{
+    color:"#22d3ee"
+  },
+  "& .MuiOutlinedInput-notchedOutline":{
+    borderColor:"#cbd5e1"
+  }
 };
 
-const ListaAprendices = () => {
-  const API_BASE = "http://localhost:8081/api/v1/aprendiz";
-  //const API_BASE = "https://backadso-production.up.railway.app/api/v1/aprendiz"
+// Componente principal que maneja la lista de aprendices
+const ListaAprendices =()=>{
 
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ nombre: "", apellido: "", email: "", telefono: "", direccion: "" });
-  const [idFiltro, setIdFiltro] = useState("");
+const [data,setData]=useState([]);
+const [loading,setLoading]=useState(false);
 
-  const fetchTodos = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(API_BASE);
-      setData(res.data || []);
-    } catch (e) {
-      console.error("Error cargando aprendices:", e);
-      setData([]);
-    } finally { setLoading(false); }
-  };
+const [form,setForm]=useState({
+ nombre:"",
+ apellido:"",
+ email:"",
+ telefono:"",
+ direccion:"",
+ ficha:"",
+ estado:"",
+ RH:"",
+ regional:"",
+ programa:""
+});
 
-  const fetchPorId = async () => {
-    if (!idFiltro) return;
-    try {
-      setLoading(true);
-      const res = await axios.get(`${API_BASE}/${idFiltro}`);
-      setData(res.data ? [res.data] : []);
-    } catch { setData([]); } finally { setLoading(false); }
-  };
+const [idFiltro,setIdFiltro]=useState("");
+const [editando,setEditando]=useState(false);
+const [idActualizar,setIdActualizar]=useState(null);
 
-  const crearAprendiz = async () => {
-    try {
-      setLoading(true);
-      await axios.post(API_BASE, form, { headers: { "Content-Type": "application/json" } });
-      setForm({ nombre: "", apellido: "", email: "", telefono: "", direccion: "" });
-      await fetchTodos();
-    } catch (e) { console.error("Error creando aprendiz:", e); }
-    finally { setLoading(false); }
-  };
 
-  const eliminarPorId = async () => {
-    if (!idFiltro) return;
-    try { setLoading(true); await axios.delete(`${API_BASE}/${idFiltro}`); await fetchTodos(); }
-    catch (e) { console.error("Error eliminando aprendiz:", e); }
-    finally { setLoading(false); }
-  };
+// Función para limpiar el formulario
+const limpiarFormulario=()=>{
+ setForm({
+  nombre:"",
+  apellido:"",
+  email:"",
+  telefono:"",
+  direccion:"",
+  ficha:"",
+  estado:"",
+  RH:"",
+  regional:"",
+  programa:""
+ });
+};
 
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box sx={{ mt: 4, px: { xs: 2, md: 4 } }}>
-        {/* Barra de acciones */}
-        <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-          <Typography variant="h5" sx={{ flex: 1, fontWeight: 700, color: "text.primary" }}>
-            Aprendices
-          </Typography>
-          <Button variant="contained" color="primary" onClick={fetchTodos} disabled={loading}>
-            {loading ? "Cargando..." : "VER TODOS"}
-          </Button>
-          <TextField
-            size="small" label="ID" value={idFiltro} onChange={(e) => setIdFiltro(e.target.value)}
-            sx={{ ...inputSX, width: 140 }}
-          />
-          <Button variant="contained" color="secondary" onClick={fetchPorId} disabled={loading || !idFiltro}>
-            BUSCAR POR ID
-          </Button>
-          <Button variant="contained" color="error" onClick={eliminarPorId} disabled={loading || !idFiltro}>
-            ELIMINAR POR ID
-          </Button>
-        </Stack>
 
-        {/* Formulario creación */}
-        <Paper elevation={4} sx={{ p: 2, mb: 3, border: "1px solid #334155", bgcolor: "background.paper" }}>
-          <Typography sx={{ mb: 2, fontWeight: 600, color: "text.primary" }}>Crear aprendiz</Typography>
-          <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-            <TextField label="Nombre" value={form.nombre}
-              onChange={(e) => setForm({ ...form, nombre: e.target.value })} sx={{ ...inputSX, flex: 1 }} />
-            <TextField label="Apellido" value={form.apellido}
-              onChange={(e) => setForm({ ...form, apellido: e.target.value })} sx={{ ...inputSX, flex: 1 }} />
-            <TextField label="Email" value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })} sx={{ ...inputSX, flex: 1.2 }} />
-            <TextField label="Teléfono" value={form.telefono}
-              onChange={(e) => setForm({ ...form, telefono: e.target.value })} sx={{ ...inputSX, flex: 1 }} />
-            <TextField label="Dirección" value={form.direccion}
-              onChange={(e) => setForm({ ...form, direccion: e.target.value })} sx={{ ...inputSX, flex: 1.6 }} />
-            <Button variant="contained" color="primary" onClick={crearAprendiz} disabled={loading}>
-              CREAR
-            </Button>
-          </Stack>
-        </Paper>
+// Función para obtener todos los aprendices
+const fetchTodos=async()=>{
+ try{
+  setLoading(true);
+  const res=await obtenerAprendices();
+  setData(res.data || []);
+ }catch(error){
+  console.log(error);
+  setData([]);
+ }finally{
+  setLoading(false);
+ }
+};
 
-        {/* Tabla */}
-        <TableContainer component={Paper} elevation={3} sx={{ border: "1px solid #334155", bgcolor: "background.paper" }}>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ background: "#22d3ee" }}>
-                {["ID","Nombre","Apellido","Email","Teléfono","Dirección"].map((h) => (
-                  <TableCell key={h} sx={{ color: "#0b1220", fontWeight: 700 }}>{h}</TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.map((row, i) => (
-                <TableRow
-                  key={row.id ?? i}
-                  sx={{
-                    backgroundColor: i % 2 === 0 ? "#0f172a" : "#111827",
-                    "&:hover": { backgroundColor: "#1f2937" }
-                  }}
-                >
-                  <TableCell sx={{ color: "text.primary" }}>{row.id}</TableCell>
-                  <TableCell sx={{ color: "text.primary" }}>{row.nombre}</TableCell>
-                  <TableCell sx={{ color: "text.primary" }}>{row.apellido}</TableCell>
-                  <TableCell sx={{ color: "text.primary" }}>{row.email}</TableCell>
-                  <TableCell sx={{ color: "text.primary" }}>{row.telefono}</TableCell>
-                  <TableCell sx={{ color: "text.primary" }}>{row.direccion}</TableCell>
-                </TableRow>
-              ))}
-              {data.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ color: "text.secondary" }}>
-                    Sin registros
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-    </ThemeProvider>
-  );
+
+// Función para obtener un aprendiz por ID
+const fetchPorId=async()=>{
+
+if(!idFiltro)return;
+
+try{
+
+ const res=await obtenerAprendizPorId(idFiltro);
+
+ setData(res.data ? [res.data] : []);
+
+}catch(error){
+
+ console.log(error);
+ setData([]);
+
+}
+
+};
+
+
+// Función para buscar un aprendiz por ID y llenar el formulario para actualizar
+const buscarParaActualizar=async(id)=>{
+
+if(!id)return;
+
+setIdFiltro(id);
+
+try{
+
+ const res=await obtenerAprendizPorId(id);
+
+ const aprendiz=res.data;
+
+
+ setForm({
+  nombre:aprendiz.nombre || "",
+  apellido:aprendiz.apellido || "",
+  email:aprendiz.email || "",
+  telefono:aprendiz.telefono || "",
+  direccion:aprendiz.direccion || "",
+  ficha:aprendiz.ficha || "",
+  estado:aprendiz.estado || "",
+  RH:aprendiz.RH || "",
+  regional:aprendiz.regional || "",
+  programa:aprendiz.programa || ""
+ });
+
+
+ setIdActualizar(aprendiz.id);
+ setEditando(true);
+
+
+}catch(error){
+
+console.log(error);
+
+}
+
+};
+
+
+// Función para crear un nuevo aprendiz
+const crearAprendiz=async()=>{
+
+  console.log(form);
+
+try{
+
+setLoading(true);
+
+await crearServicio(form);
+
+limpiarFormulario();
+
+await fetchTodos();
+
+}catch(error){
+
+if(error.response?.status === 500){
+
+alert("No se pudo crear el aprendiz. Verifique que el correo no esté registrado.");
+
+}else{
+
+alert("Ocurrió un error al crear el aprendiz.");
+
+}
+
+console.log(error);
+
+}finally{
+
+setLoading(false);
+
+}
+
+};
+
+// Función para actualizar un aprendiz existente
+
+const actualizarAprendiz=async()=>{
+
+try{
+
+await actualizarServicio(idActualizar,form);
+
+setEditando(false);
+
+setIdActualizar(null);
+
+limpiarFormulario();
+
+await fetchTodos();
+
+}catch(error){
+
+console.log(error);
+
+}
+
+};
+
+// Función para eliminar un aprendiz por ID
+const eliminarPorId=async()=>{if(!idFiltro)return;
+
+try{
+
+setLoading(true);
+
+await eliminarServicio(idFiltro);
+
+await fetchTodos();
+
+}catch(error){
+
+console.log(error);
+
+}finally{
+
+setLoading(false);
+
+}
+
+};
+
+return(
+
+// Renderizado del componente con tema personalizado y formulario de aprendices
+<ThemeProvider theme={theme}>
+
+<CssBaseline/>
+
+<Box sx={{mt:4,px:{xs:2,md:4}}}>
+
+<Stack direction="row" spacing={2} alignItems="center" sx={{mb:2}}>
+
+<Typography variant="h5" sx={{flex:1,fontWeight:700}}>
+Aprendices
+</Typography>
+
+
+<Button 
+variant="contained" 
+onClick={fetchTodos}
+disabled={loading}
+>
+{loading?"Cargando...":"VER TODOS"}
+</Button>
+
+
+<TextField
+size="small"
+label="ID"
+value={idFiltro}
+onChange={(e)=>setIdFiltro(e.target.value)}
+sx={{...inputSX,width:140}}
+/>
+
+
+<Button
+variant="contained"
+color="secondary"
+onClick={fetchPorId}
+disabled={!idFiltro}
+>
+BUSCAR POR ID
+</Button>
+
+
+<Button
+variant="contained"
+color="primary"
+onClick={()=>buscarParaActualizar(idFiltro)}
+disabled={!idFiltro}
+>
+Actualizar por ID
+</Button>
+
+
+<Button
+variant="contained"
+color="error"
+onClick={eliminarPorId}
+disabled={!idFiltro}
+>
+ELIMINAR
+</Button>
+
+
+{
+editando && (
+
+<Button
+variant="outlined"
+color="error"
+onClick={()=>{
+
+setEditando(false);
+setIdActualizar(null);
+limpiarFormulario();
+
+}}
+>
+CANCELAR
+</Button>
+
+)
+}
+
+
+</Stack>
+
+<AprendizForm
+form={form}
+setForm={setForm}
+crearAprendiz={crearAprendiz}
+actualizarAprendiz={actualizarAprendiz}
+editando={editando}
+inputSX={inputSX}
+/>
+
+<AprendizTable
+data={data}
+buscarParaActualizar={buscarParaActualizar}
+/>
+
+</Box>
+</ThemeProvider>
+
+);
 };
 
 export default ListaAprendices;

@@ -1,0 +1,38 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql-tocora
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: aprendiz
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+
+  backend:
+    build: ../../Backend_Java/proyecto
+    container_name: backend-tocora
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/aprendiz
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build: .
+    container_name: frontend-tocora
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
